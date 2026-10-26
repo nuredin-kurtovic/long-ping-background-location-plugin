@@ -1,26 +1,50 @@
-name: Publish to npm
+name: Release
 
-# Runs when a GitHub release is published. The release tag must equal the version in package.json
-# (e.g. tag 0.1.1 for "version": "0.1.1"). npm trusts this workflow through trusted publishing (OIDC),
-# so no npm token is stored anywhere, and every release gets a provenance attestation.
+# Every merge to main that changes what ships in the npm package is a public release:
+#  - the tests run first (ci.yml); nothing is published if they fail;
+#  - if package.json's version is already on npm, the patch number is bumped automatically
+#    (0.1.1 -> 0.1.2) and committed; if you bumped it yourself (e.g. 0.2.0), that version is used;
+#  - it is published to npm through trusted publishing (OIDC: no npm token is stored anywhere),
+#    tagged, and a GitHub release with generated notes is created.
+# "Run workflow" on the Actions tab releases the current version without a code change.
+# npm's trusted-publisher setting names this file, so keep the name publish.yml.
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'android/build.gradle'
+      - 'android/src/main/**'
+      - 'ios/LongPing.h'
+      - 'ios/LongPing.mm'
+      - 'ios/Core/**'
+      - 'ios/Engine/**'
+      - 'ios/PrivacyInfo.xcprivacy'
+      - 'LongPing.podspec'
+      - 'package.json'
+      - 'README.md'
+      - 'LICENSE.md'
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+# One release at a time: a second merge waits for the first to finish.
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   test:
     uses: ./.github/workflows/ci.yml
 
-  publish:
+  release:
     name: Publish
     needs: test
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
+      contents: write # version-bump commit, tag, GitHub release
+      id-token: write # npm trusted publishing
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,12 +53,37 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       # Trusted publishing needs npm 11.5.1 or later; Node 22 ships with npm 10.
       - run: npm install -g npm@11
-      - name: Release tag matches package.json
+
+      - name: Pick the version
+        id: version
         run: |
-          version=$(node -p "require('./package.json').version")
-          tag="${GITHUB_REF_NAME#v}"
-          if [ "$version" != "$tag" ]; then
-            echo "Release tag $GITHUB_REF_NAME does not match package.json version $version" >&2
-            exit 1
+          name=$(node -p "require('./package.json').name")
+          current=$(node -p "require('./package.json').version")
+          published=$(npm view "$name@$current" version 2>/dev/null || true)
+          if [ "$published" = "$current" ]; then
+            npm version patch --no-git-tag-version >/dev/null
+            echo "bumped=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
           fi
+          next=$(node -p "require('./package.json').version")
+          # The iOS engine logs its version; it moves with package.json.
+          sed -i -E "s/(static let version = \")[^\"]+(\")/\1${next}\2/" ios/Engine/EngineSupport.swift
+          echo "version=$next" >> "$GITHUB_OUTPUT"
+          echo "Releasing $next"
+
+      - name: Commit the version bump
+        if: steps.version.outputs.bumped == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Release ${{ steps.version.outputs.version }}"
+          git push origin HEAD:main
+
       - run: npm publish
+
+      - name: Tag and GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh release create "$VERSION" --target "$(git rev-parse HEAD)" --title "$VERSION" --generate-notes

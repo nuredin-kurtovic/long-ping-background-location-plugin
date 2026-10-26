@@ -42,3 +42,11 @@ jobs:
         with:
           node-version: '22'
       - run: npm pack --dry-run
+      - name: iOS engine version matches package.json
+        run: |
+          pkg=$(node -p "require('./package.json').version")
+          ios=$(sed -nE 's/.*static let version = "([^"]+)".*/\1/p' ios/Engine/EngineSupport.swift)
+          if [ "$pkg" != "$ios" ]; then
+            echo "package.json is $pkg but ios/Engine/EngineSupport.swift says $ios" >&2
+            exit 1
+          fi
