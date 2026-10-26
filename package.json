@@ -1,6 +1,6 @@
 {
   "name": "react-native-long-ping",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Background location for React Native on a fixed clock: any interval from 1 second, native upload queue, survives kills and reboots, no motion-classifier guesswork.",
   "homepage": "https://longping.nuredinkurtovic.info",
   "repository": {

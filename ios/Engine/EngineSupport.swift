@@ -86,7 +86,7 @@ private extension LogLevel {
 
 /// Reported in the log at engine start.
 enum PluginInfo {
-    static let version = "0.1.1"
+    static let version = "0.1.2"
 }
 
 extension Fix {
