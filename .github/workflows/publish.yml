@@ -1,0 +1,40 @@
+name: Publish to npm
+
+# Runs when a GitHub release is published. The release tag must equal the version in package.json
+# (e.g. tag 0.1.1 for "version": "0.1.1"). npm trusts this workflow through trusted publishing (OIDC),
+# so no npm token is stored anywhere, and every release gets a provenance attestation.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Publish
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing needs npm 11.5.1 or later; Node 22 ships with npm 10.
+      - run: npm install -g npm@11
+      - name: Release tag matches package.json
+        run: |
+          version=$(node -p "require('./package.json').version")
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$version" != "$tag" ]; then
+            echo "Release tag $GITHUB_REF_NAME does not match package.json version $version" >&2
+            exit 1
+          fi
+      - run: npm publish
