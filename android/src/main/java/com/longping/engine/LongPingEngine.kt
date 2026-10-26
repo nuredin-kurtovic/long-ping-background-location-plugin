@@ -56,6 +56,7 @@ class LongPingEngine private constructor(context: Context) {
     companion object {
         private const val TAG = "engine"
         private const val WATCHDOG_MS = 60_000L
+        private const val DUE_FIX_MIN_DELAY_MS = 1_000L
         private const val STATE_PERSIST_EVERY_MS = 30_000L
         private const val PRUNE_EVERY_TICKS = 60
         private const val DAY_MS = 86_400_000L
@@ -142,6 +143,22 @@ class LongPingEngine private constructor(context: Context) {
             }
             if (service != null) handler.postDelayed(this, WATCHDOG_MS)
         }
+    }
+
+    /**
+     * Android delivers fixes on the fused provider's own clock, about once per interval and often a little
+     * early, or early by a lot when another request on the device woke it. A fix skipped as too soon then
+     * left the next one a whole interval away (60 s became 120 s, 180 s became 5 min on a Galaxy S22), so a
+     * skip asks for one fresh fix at the moment the interval is due. Any record cancels it.
+     */
+    private val dueFix = Runnable { service?.requestImmediateFix(config.accuracy) }
+
+    private fun scheduleDueFix() {
+        val wait = Intervals.msUntilDue(gate.lastRecordedTimeMs, currentIntervalMs(), clock.nowMs()) ?: return
+        handler.removeCallbacks(dueFix)
+        // At least DUE_FIX_MIN_DELAY_MS: a fix fetched right at the due time can carry a timestamp a
+        // moment before it, and must not turn into back-to-back requests.
+        handler.postDelayed(dueFix, maxOf(wait, DUE_FIX_MIN_DELAY_MS))
     }
 
     /** Posted when the fused provider reports "unavailable"; cancelled if it recovers within the grace. */
@@ -545,6 +562,7 @@ class LongPingEngine private constructor(context: Context) {
         activeSpec = null
         battery.stop()
         handler.removeCallbacks(watchdog)
+        handler.removeCallbacks(dueFix)
         resetAvailability()
         svc.shutdown()
     }
@@ -566,7 +584,10 @@ class LongPingEngine private constructor(context: Context) {
             is RecordingGate.Decision.Skip -> when (decision.reason) {
                 RecordingGate.SkipReason.INACCURATE ->
                     log.info(TAG, "fix rejected: ±${fmt(fix.accuracy)} m is worse than minAccuracyM ${fmt(config.minAccuracyM)} m")
-                RecordingGate.SkipReason.TOO_SOON -> log.debug(TAG, "fix skipped: interval not reached")
+                RecordingGate.SkipReason.TOO_SOON -> {
+                    log.debug(TAG, "fix skipped: interval not reached")
+                    scheduleDueFix()
+                }
             }
         }
 
@@ -584,6 +605,7 @@ class LongPingEngine private constructor(context: Context) {
 
     /** Stores, emits and queues one record. */
     private fun record(fix: Fix, event: RecordEvent, callExtras: JSONObject?): JSONObject {
+        handler.removeCallbacks(dueFix)
         val uuid = UUID.randomUUID().toString()
         val json = LocationRecord.build(uuid, fix, event, state.isMoving, battery.current(), LocationRecord.mergeExtras(config.http.extras(), callExtras))
         try {

@@ -2,6 +2,7 @@ package com.longping.core
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -31,6 +32,13 @@ class IntervalsTest {
         assertEquals(BatteryState(0.5, true), BatteryState.fromRaw(50, 100, true))
         assertEquals(-1.0, BatteryState.fromRaw(-1, 100, false).level, 0.0)
         assertEquals(-1.0, BatteryState.fromRaw(50, 0, false).level, 0.0)
+    }
+
+    @Test fun msUntilDueIsWhenTheRecordingRuleAcceptsTheNextFix() {
+        // Last record at 100_000, 60 s interval, 0.5 s tolerance -> due at 159_500.
+        assertEquals(2_500L, Intervals.msUntilDue(100_000, 60_000, 157_000))
+        assertEquals(0L, Intervals.msUntilDue(100_000, 60_000, 170_000))
+        assertNull(Intervals.msUntilDue(null, 60_000, 157_000))
     }
 
     @Test fun toleranceIsMinOfHalfASecondAndTenPercent() {

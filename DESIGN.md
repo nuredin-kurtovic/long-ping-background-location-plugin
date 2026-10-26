@@ -161,6 +161,12 @@ the most accurate fix seen since the last record (accuracy filter waived, logged
 
 Motion changes always record immediately (event `motionchange`), regardless of interval.
 
+Android: the fused provider delivers on its own clock, about once per interval and often a little early (or
+early by a lot when another request on the device wakes it). A fix skipped as too soon schedules one fresh
+fix (`getCurrentLocation`) for the moment the interval is due (at least 1 s later); any record cancels it. Without
+this a skip leaves the next fix a whole interval away. iOS needs no equivalent: it delivers every second
+around the due time.
+
 `event` values: `interval` (normal), `motionchange`, `current` (getCurrentPosition with persist).
 
 ## Stop detection (pure core; identical on both platforms)

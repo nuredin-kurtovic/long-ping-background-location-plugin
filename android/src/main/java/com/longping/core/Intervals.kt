@@ -31,6 +31,13 @@ object Intervals {
     fun toleranceMs(intervalMs: Long): Long = min(500L, intervalMs / 10)
 
     /**
+     * How long until a fix is due again: the first moment the recording rule accepts one. 0 when it
+     * already is; null before anything was recorded (the next fix records regardless).
+     */
+    fun msUntilDue(lastRecordedMs: Long?, intervalMs: Long, nowMs: Long): Long? =
+        lastRecordedMs?.let { max(0L, it + intervalMs - toleranceMs(intervalMs) - nowMs) }
+
+    /**
      * Watchdog rule: no fix for longer than max(2 x interval, interval + 60 s) means the OS
      * request is stuck and must be re-issued. Before the first fix, pass the time updates were
      * requested as [lastFixMs].
