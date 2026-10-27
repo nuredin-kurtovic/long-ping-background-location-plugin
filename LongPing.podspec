@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.name         = "LongPing"
   s.version      = package["version"]
   s.summary      = package["description"]
-  s.homepage     = "https://longping.nuredinkurtovic.info"
+  s.homepage     = "https://longping.dev"
   s.license      = { :type => "MIT", :file => "LICENSE.md" }
   s.authors      = "Long Ping"
   s.platforms    = { :ios => "15.1" }
