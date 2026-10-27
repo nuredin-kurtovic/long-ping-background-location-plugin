@@ -48,7 +48,8 @@ cd ios && pod install
 ### Android
 
 Nothing to add: the plugin's manifest brings the location, foreground-service and boot permissions. On Android
-13+ ask for `POST_NOTIFICATIONS` so the tracking notification is visible. If your Play listing qualifies, also
+13+ declare `<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />` in your app's manifest
+(the plugin doesn't) and ask for it, so the tracking notification is visible. If your Play listing qualifies, also
 declare `android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` to use the direct exemption prompt.
 
 **Google Play.** The plugin's manifest adds `ACCESS_BACKGROUND_LOCATION` and a foreground service of type
