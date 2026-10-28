@@ -20,6 +20,7 @@ on:
       - 'ios/Core/**'
       - 'ios/Engine/**'
       - 'ios/PrivacyInfo.xcprivacy'
+      - 'app.plugin.js'
       - 'LongPing.podspec'
       - 'package.json'
       - 'README.md'
