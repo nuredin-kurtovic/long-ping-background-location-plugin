@@ -21,7 +21,7 @@ Free and open source (MIT). No license key, no paid tier.
 
 **Docs and guides: [longping.dev](https://longping.dev)**
 
-Requires React Native 0.76+ (New Architecture), iOS 15.1+, Android 7.0+ (API 24).
+Requires React Native 0.76+ (New Architecture), iOS 15.1+, Android 7.0+ (API 24). Expo: SDK 52+ with the bundled config plugin.
 
 ## Install
 
@@ -29,6 +29,36 @@ Requires React Native 0.76+ (New Architecture), iOS 15.1+, Android 7.0+ (API 24)
 npm install react-native-long-ping
 cd ios && pod install
 ```
+
+### Expo
+
+Works in a development build or with `npx expo prebuild` (not in Expo Go). Add the config plugin to `app.json`
+and it writes the iOS and Android settings below for you:
+
+```sh
+npx expo install react-native-long-ping
+```
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "react-native-long-ping",
+        {
+          "locationWhenInUsePermission": "Your location is shared with dispatch while you are on duty.",
+          "locationAlwaysAndWhenInUsePermission": "Your location is shared with dispatch while you are on duty, including when the app is closed."
+        }
+      ]
+    ]
+  }
+}
+```
+
+Options: `locationWhenInUsePermission` and `locationAlwaysAndWhenInUsePermission` (iOS prompt texts),
+`backgroundLocation: false` (the app only tracks while it is open), `ignoreBatteryOptimizationsPermission: true`
+(declares `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`). Then build with `npx expo run:ios`, `npx expo run:android` or
+EAS Build.
 
 ### iOS
 

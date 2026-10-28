@@ -1,6 +1,6 @@
 {
   "name": "react-native-long-ping",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Background geolocation for React Native on a fixed clock: any interval from 1 second, native upload queue, survives kills and reboots, no motion-classifier guesswork.",
   "homepage": "https://longping.dev",
   "repository": {
@@ -24,6 +24,7 @@
     "ios/Engine",
     "ios/Core",
     "ios/PrivacyInfo.xcprivacy",
+    "app.plugin.js",
     "LongPing.podspec",
     "README.md",
     "LICENSE.md"
@@ -40,7 +41,9 @@
     "background-geolocation",
     "location-tracking",
     "react-native-geolocation",
-    "gps-tracking"
+    "gps-tracking",
+    "expo",
+    "expo-config-plugin"
   ],
   "license": "MIT",
   "peerDependencies": {
