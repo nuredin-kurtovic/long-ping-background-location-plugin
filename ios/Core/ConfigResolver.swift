@@ -40,7 +40,7 @@ enum ConfigResolver {
     // MARK: - Unknown keys
 
     private static let topLevelKeys: Set<String> = [
-        "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
+        "licenseKey", "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
         "stopRadiusM", "movingSpeedMps", "disableStopDetection", "lowBattery", "http", "persistence",
         "startOnBoot", "stopOnTerminate", "remoteConfig", "notification", "ios", "logLevel", "logMaxDays", "debug",
     ]
@@ -75,6 +75,9 @@ enum ConfigResolver {
         mutating func decode(_ root: JSONObject) throws -> LongPingConfig {
             let d = LongPingConfig.defaults
             var c = LongPingConfig()
+            c.licenseKey = try optionalString(root, "licenseKey", path: "")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .flatMap { $0.isEmpty ? nil : $0 }
             c.movingIntervalSec = try number(root, "movingIntervalSec", path: "", default: d.movingIntervalSec, clamp: 1...86_400)
             c.parkedIntervalSec = try number(root, "parkedIntervalSec", path: "", default: d.parkedIntervalSec, clamp: 1...86_400)
             c.accuracy = try enumeration(root, "accuracy", path: "", default: d.accuracy)

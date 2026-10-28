@@ -84,6 +84,7 @@ data class IosConfig(
 
 /** The resolved config: every key present, validated and clamped. Defaults match DESIGN.md. */
 data class LongPingConfig(
+    val licenseKey: String? = null,
     val movingIntervalSec: Double = 30.0,
     val parkedIntervalSec: Double = 180.0,
     val accuracy: Accuracy = Accuracy.HIGH,
@@ -106,6 +107,7 @@ data class LongPingConfig(
 ) {
     /** The persisted / reported form: every key, in contract order. */
     fun toJson(): JSONObject = JSONObject().apply {
+        put("licenseKey", licenseKey ?: JSONObject.NULL)
         put("movingIntervalSec", movingIntervalSec)
         put("parkedIntervalSec", parkedIntervalSec)
         put("accuracy", accuracy.wire)

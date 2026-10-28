@@ -3,6 +3,7 @@ package com.longping.core
 /** Promise rejection codes (DESIGN.md, "Error codes"). The enum name is the wire value. */
 enum class ErrorCode {
     INVALID_CONFIG,
+    LICENSE_INVALID,
     PERMISSION_DENIED,
     LOCATION_SERVICES_OFF,
     NOT_ENABLED,
