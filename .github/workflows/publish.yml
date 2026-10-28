@@ -15,6 +15,7 @@ on:
       - 'src/**'
       - 'android/build.gradle'
       - 'android/src/main/**'
+      - 'android/consumer-rules.pro'
       - 'ios/LongPing.h'
       - 'ios/LongPing.mm'
       - 'ios/Core/**'
@@ -81,7 +82,8 @@ jobs:
           git commit -am "Release ${{ steps.version.outputs.version }}"
           git push origin HEAD:main
 
-      - run: npm publish
+      # The repo is private (since 1.0, commercial): npm only attaches provenance to public repos.
+      - run: npm publish --provenance=false
 
       - name: Tag and GitHub release
         env:

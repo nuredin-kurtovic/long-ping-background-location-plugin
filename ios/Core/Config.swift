@@ -95,6 +95,7 @@ struct IOSConfig: Equatable {
 
 /// The fully resolved config (every key filled in). Field names and defaults mirror DESIGN.md.
 struct LongPingConfig: Equatable {
+    var licenseKey: String?
     var movingIntervalSec: Double = 30
     var parkedIntervalSec: Double = 180
     var accuracy: Accuracy = .high
@@ -135,6 +136,7 @@ struct LongPingConfig: Equatable {
         http["timeoutSec"] = .number(self.http.timeoutSec)
 
         var root = JSONObject()
+        root["licenseKey"] = licenseKey.map(JSONValue.string) ?? .null
         root["movingIntervalSec"] = .number(movingIntervalSec)
         root["parkedIntervalSec"] = .number(parkedIntervalSec)
         root["accuracy"] = .string(accuracy.rawValue)

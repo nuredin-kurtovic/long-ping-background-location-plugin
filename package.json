@@ -1,14 +1,11 @@
 {
   "name": "react-native-long-ping",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Background geolocation for React Native on a fixed clock: any interval from 1 second, native upload queue, survives kills and reboots, no motion-classifier guesswork.",
   "homepage": "https://longping.dev",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nuredin-kurtovic/long-ping-background-location-plugin.git"
-  },
-  "bugs": {
-    "url": "https://github.com/nuredin-kurtovic/long-ping-background-location-plugin/issues"
   },
   "author": "Nuredin Kurtovic",
   "main": "src/index.ts",
@@ -19,6 +16,7 @@
     "src",
     "android/build.gradle",
     "android/src/main",
+    "android/consumer-rules.pro",
     "ios/LongPing.h",
     "ios/LongPing.mm",
     "ios/Engine",
@@ -45,7 +43,7 @@
     "expo",
     "expo-config-plugin"
   ],
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE.md",
   "peerDependencies": {
     "react": "*",
     "react-native": ">=0.76.0"

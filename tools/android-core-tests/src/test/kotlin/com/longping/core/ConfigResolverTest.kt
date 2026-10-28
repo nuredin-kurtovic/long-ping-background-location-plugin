@@ -12,6 +12,7 @@ class ConfigResolverTest {
 
     @Test fun defaultsMatchTheContract() {
         val c = resolve("{}")
+        assertNull(c.licenseKey)
         assertEquals(30.0, c.movingIntervalSec, 0.0)
         assertEquals(180.0, c.parkedIntervalSec, 0.0)
         assertEquals(Accuracy.HIGH, c.accuracy)
@@ -53,13 +54,13 @@ class ConfigResolverTest {
 
     @Test fun toJsonHasEveryKeyAndRoundTrips() {
         val c = resolve(
-            """{"movingIntervalSec":5,"lowBattery":{"belowPct":20,"intervalSec":600},
+            """{"licenseKey":"LP1.a.b","movingIntervalSec":5,"lowBattery":{"belowPct":20,"intervalSec":600},
                "http":{"url":"https://x.test/l","headers":{"X-A":"1"},"params":{"p":[1,2]},"extras":{"e":true},
                "locationTemplate":"{\"lat\":{{latitude}}}"},"notification":{"smallIcon":"ic_stat"},"debug":true}""",
         )
         val j = c.toJson()
         listOf(
-            "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
+            "licenseKey", "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
             "stopRadiusM", "movingSpeedMps", "disableStopDetection", "lowBattery", "http", "persistence", "startOnBoot",
             "stopOnTerminate", "remoteConfig", "notification", "ios", "logLevel", "logMaxDays", "debug",
         ).forEach { assertTrue(it, j.has(it)) }
@@ -117,6 +118,7 @@ class ConfigResolverTest {
         assertThrowsConfig("disableStopDetection") { resolve("""{"disableStopDetection":"yes"}""") }
         assertThrowsConfig("accuracy") { resolve("""{"accuracy":"ultra"}""") }
         assertThrowsConfig("accuracy") { resolve("""{"accuracy":1}""") }
+        assertThrowsConfig("licenseKey") { resolve("""{"licenseKey":42}""") }
         assertThrowsConfig("http") { resolve("""{"http":"https://x"}""") }
         assertThrowsConfig("http.maxBatchSize") { resolve("""{"http":{"maxBatchSize":"many"}}""") }
         assertThrowsConfig("http.batch") { resolve("""{"http":{"batch":1}}""") }
@@ -234,9 +236,8 @@ class ConfigResolverTest {
         assertEquals(ConfigResolver.defaults(), ConfigResolver.restore("""{"movingIntervalSec":"x"}"""))
     }
 
-    @Test fun licenseKeyFromOlderSetupsIsIgnored() {
-        val r = ConfigResolver.resolve(json("""{"licenseKey":"LP1.x.y"}"""))
-        assertEquals(listOf("licenseKey"), r.unknownKeys)
-        assertEquals(ConfigResolver.defaults(), r.config)
+    @Test fun licenseKeyBlankIsNull() {
+        assertNull(resolve("""{"licenseKey":"   "}""").licenseKey)
+        assertEquals("LP1.x.y", resolve("""{"licenseKey":" LP1.x.y "}""").licenseKey)
     }
 }

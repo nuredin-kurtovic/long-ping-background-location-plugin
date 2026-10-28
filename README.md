@@ -17,11 +17,12 @@ quiet for three hours" is not acceptable.
   termination on significant movement or leaving the parked area.
 - **Explains its silences.** An on-device log of every state change, restart and upload, readable from JS.
 
-Free and open source (MIT). No license key, no paid tier.
+Free to try in debug builds, simulators and emulators. Release builds need a license key: **$99 per app, paid
+once**, Expo plugin and updates included. Buy at [longping.dev/pricing](https://longping.dev/pricing).
 
 **Docs and guides: [longping.dev](https://longping.dev)**
 
-Requires React Native 0.76+ (New Architecture), iOS 15.1+, Android 7.0+ (API 24). Expo: SDK 52+ with the bundled config plugin.
+Requires React Native 0.76+ (New Architecture), iOS 15.1+, Android 7.0+ (API 24). Expo: SDK 52+ with the included config plugin.
 
 ## Install
 
@@ -106,6 +107,7 @@ Both platforms block cleartext HTTP by default (Android since targetSdk 28). For
 import LongPing from 'react-native-long-ping';
 
 await LongPing.configure({
+  licenseKey: 'LP1.…',             // release builds only; debug builds run without one
   movingIntervalSec: 30,
   parkedIntervalSec: 180,
   http: {
@@ -184,5 +186,6 @@ stops tracking.
 
 ## License
 
-Free and open source under the MIT license: free for personal and commercial use, no license key, no paid tier,
-no limits. See `LICENSE.md`.
+Commercial; see `LICENSE.md`. A license key is tied to your app's bundle id / application id, is paid once and
+never stops working. Debug builds, simulators and emulators run without a key; in a release build without a valid
+key, `start()` rejects with `LICENSE_INVALID` and nothing is tracked. `getState()` reports `license`.

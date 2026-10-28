@@ -35,7 +35,7 @@ const LongPing = {
   configure: (config: Config): Promise<State> => NativeLongPing.configure(config) as Promise<State>,
   /** Merge into your app's config and apply it live. Server overrides stay on top. */
   setConfig: (config: Config): Promise<State> => NativeLongPing.setConfig(config) as Promise<State>,
-  /** Start tracking. Rejects PERMISSION_DENIED or LOCATION_SERVICES_OFF; never prompts. */
+  /** Start tracking. Rejects LICENSE_INVALID, PERMISSION_DENIED or LOCATION_SERVICES_OFF; never prompts. */
   start: (): Promise<State> => NativeLongPing.start() as Promise<State>,
   /** Stop tracking. Queued records still upload. */
   stop: (): Promise<State> => NativeLongPing.stop() as Promise<State>,
