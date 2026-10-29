@@ -15,7 +15,6 @@ export type AuthorizationStatus = (typeof AuthorizationStatus)[keyof typeof Auth
 
 export type ErrorCode =
   | 'INVALID_CONFIG'
-  | 'LICENSE_INVALID'
   | 'PERMISSION_DENIED'
   | 'LOCATION_SERVICES_OFF'
   | 'NOT_ENABLED'
@@ -54,8 +53,6 @@ export interface HttpConfig {
 }
 
 export interface Config {
-  /** Required for release builds (longping.dev/pricing). Debug builds, simulators and emulators run without one. */
-  licenseKey?: string | null;
   /** Seconds between fixes while moving. 1..86400, default 30. */
   movingIntervalSec?: number;
   /** Seconds between fixes while parked. 1..86400, default 180. */
@@ -153,8 +150,6 @@ export interface State {
   lastLocationAt: number | null;
   queueCount: number;
   authorizationRequired: boolean;
-  /** 'debug': development build without a valid key (tracking works); release builds need 'valid'. */
-  license: 'valid' | 'debug' | 'invalid' | 'missing';
   /** The config in effect: your app's config with the server's overrides on top. */
   config: ResolvedConfig;
 }

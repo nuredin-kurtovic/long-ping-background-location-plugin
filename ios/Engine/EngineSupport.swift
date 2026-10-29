@@ -86,36 +86,7 @@ private extension LogLevel {
 
 /// Reported in the log at engine start.
 enum PluginInfo {
-    static let version = "1.0.0"
-}
-
-/// Release builds verify the key; debug builds and the simulator run without one (DESIGN.md, "License").
-enum LicenseGate {
-    struct Evaluation {
-        let status: LicenseStatus
-        /// What the key itself verified as, for the log (also in debug builds, so problems show up early).
-        let keyResult: LicenseVerifier.Result
-    }
-
-    static var isDevelopmentBuild: Bool {
-        #if DEBUG
-        return true
-        #elseif targetEnvironment(simulator)
-        return true
-        #else
-        return false
-        #endif
-    }
-
-    static func evaluate(key: String?) -> Evaluation {
-        let appId = Bundle.main.bundleIdentifier ?? ""
-        let result = LicenseVerifier().verify(key: key, appId: appId)
-        // A valid key reports 'valid' even in development builds, so integrators see it work before release.
-        let status: LicenseStatus = isDevelopmentBuild && result.status != .valid ? .debug : result.status
-        return Evaluation(status: status, keyResult: result)
-    }
-
-    static func allowsTracking(_ status: LicenseStatus) -> Bool { status == .valid || status == .debug }
+    static let version = "1.1.0"
 }
 
 extension Fix {

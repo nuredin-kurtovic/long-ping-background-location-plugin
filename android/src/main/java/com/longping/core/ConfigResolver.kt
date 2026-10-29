@@ -11,14 +11,14 @@ import kotlin.math.roundToLong
  *
  * Rules beyond the contract text (see the Android report):
  * - JSON null on a key that is not nullable means "use the default".
- * - '' on a nullable string (licenseKey, http.url, rootProperty, locationTemplate, smallIcon) is null.
+ * - '' on a nullable string (http.url, rootProperty, locationTemplate, smallIcon) is null.
  * - Integer keys (maxBatchSize, maxRecords, maxDays, logMaxDays) are rounded, then clamped.
  */
 object ConfigResolver {
     class Resolution(val config: LongPingConfig, val unknownKeys: List<String>)
 
     private val ROOT_KEYS = setOf(
-        "licenseKey", "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
+        "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
         "stopRadiusM", "movingSpeedMps", "disableStopDetection", "lowBattery", "http", "persistence",
         "startOnBoot", "stopOnTerminate", "remoteConfig", "notification", "ios", "logLevel", "logMaxDays", "debug",
     )
@@ -92,7 +92,6 @@ object ConfigResolver {
         if (minAccuracy < 0) throw ConfigException("minAccuracyM", "must be >= 0 (0 accepts any accuracy)")
 
         val config = LongPingConfig(
-            licenseKey = root.nullableString("licenseKey")?.trim()?.takeIf { it.isNotEmpty() },
             movingIntervalSec = root.number("movingIntervalSec", d.movingIntervalSec).coerceIn(1.0, 86_400.0),
             parkedIntervalSec = root.number("parkedIntervalSec", d.parkedIntervalSec).coerceIn(1.0, 86_400.0),
             accuracy = root.enumValue("accuracy", d.accuracy, Accuracy.entries),

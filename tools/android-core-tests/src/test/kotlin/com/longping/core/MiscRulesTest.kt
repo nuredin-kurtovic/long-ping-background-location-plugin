@@ -65,20 +65,6 @@ class NotificationTextTest {
     }
 }
 
-class EmulatorCheckTest {
-    @Test fun recognisesEmulators() {
-        assertTrue(EmulatorCheck.isEmulator("google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036/1:userdebug/dev-keys", "sdk_gphone64_arm64", "Google", "google", "emu64a", "sdk_gphone64_arm64", "ranchu"))
-        assertTrue(EmulatorCheck.isEmulator("generic/sdk/generic:4.4/KK/1:eng/test-keys", "sdk", "unknown", "generic", "generic", "sdk", "goldfish"))
-        assertTrue(EmulatorCheck.isEmulator("x", "Custom Phone", "Genymotion", "generic", "vbox86p", "vbox86p", "vbox86"))
-    }
-
-    @Test fun realDevicesAreNotEmulators() {
-        assertFalse(EmulatorCheck.isEmulator("google/husky/husky:14/AP1A.240305.019/1:user/release-keys", "Pixel 8 Pro", "Google", "google", "husky", "husky", "husky"))
-        assertFalse(EmulatorCheck.isEmulator("samsung/dm3qxxx/dm3q:14/UP1A/1:user/release-keys", "SM-S918B", "samsung", "samsung", "dm3q", "dm3qxxx", "qcom"))
-        assertFalse(EmulatorCheck.isEmulator("Xiaomi/ruby/ruby:13/TP1A/V14:user/release-keys", "22101316G", "Xiaomi", "Redmi", "ruby", "ruby_global", "mt6877"))
-    }
-}
-
 class PowerManagerTargetsTest {
     @Test fun coversEveryOemInTheContract() {
         assertEquals(
