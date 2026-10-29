@@ -3,7 +3,6 @@ import Foundation
 /// Promise rejection codes (DESIGN.md, "Error codes").
 enum ErrorCode: String {
     case invalidConfig = "INVALID_CONFIG"
-    case licenseInvalid = "LICENSE_INVALID"
     case permissionDenied = "PERMISSION_DENIED"
     case locationServicesOff = "LOCATION_SERVICES_OFF"
     case notEnabled = "NOT_ENABLED"

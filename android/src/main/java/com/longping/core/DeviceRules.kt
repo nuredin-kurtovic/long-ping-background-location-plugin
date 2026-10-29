@@ -1,20 +1,5 @@
 package com.longping.core
 
-/** Android emulator detection for the license's debug allowance. Conservative: hardware/product markers only. */
-object EmulatorCheck {
-    fun isEmulator(fingerprint: String, model: String, manufacturer: String, brand: String, device: String, product: String, hardware: String): Boolean {
-        val hw = hardware.lowercase()
-        val prod = product.lowercase()
-        return hw == "goldfish" || hw == "ranchu" || hw == "vbox86" ||
-            prod.startsWith("sdk_gphone") || prod == "google_sdk" || prod.startsWith("sdk_google") ||
-            prod == "sdk" || prod.startsWith("sdk_x86") || prod == "vbox86p" ||
-            fingerprint.startsWith("generic/sdk") || fingerprint.startsWith("google/sdk_gphone") ||
-            model.contains("Android SDK built for") ||
-            manufacturer.contains("Genymotion") ||
-            (brand.startsWith("generic") && device.startsWith("generic"))
-    }
-}
-
 /** OEM battery / auto-start screens tried by openPowerManagerSettings(), in order. */
 object PowerManagerTargets {
     data class Target(val oem: String, val packageName: String, val className: String)

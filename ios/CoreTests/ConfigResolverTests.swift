@@ -19,7 +19,6 @@ final class ConfigResolverTests: XCTestCase {
 
     func testDefaultsMatchContract() throws {
         let c = try resolve([:])
-        XCTAssertNil(c.licenseKey)
         XCTAssertEqual(c.movingIntervalSec, 30)
         XCTAssertEqual(c.parkedIntervalSec, 180)
         XCTAssertEqual(c.accuracy, .high)
@@ -62,12 +61,12 @@ final class ConfigResolverTests: XCTestCase {
     func testJSONKeyOrderFollowsContractAndRoundTrips() throws {
         let json = LongPingConfig.defaults.json
         XCTAssertEqual(json.objectValue?.keys, [
-            "licenseKey", "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
+            "movingIntervalSec", "parkedIntervalSec", "accuracy", "minAccuracyM", "stopTimeoutSec",
             "stopRadiusM", "movingSpeedMps", "disableStopDetection", "lowBattery", "http", "persistence",
             "startOnBoot", "stopOnTerminate", "remoteConfig", "notification", "ios", "logLevel", "logMaxDays", "debug",
         ])
         let custom = try resolve([
-            "licenseKey": "LP1.a.b", "movingIntervalSec": 5, "lowBattery": ["belowPct": 20, "intervalSec": 600],
+            "movingIntervalSec": 5, "lowBattery": ["belowPct": 20, "intervalSec": 600],
             "http": ["url": "https://example.com/locations", "headers": ["X-Key": "1"], "params": ["device": ["id": 7]],
                      "locationTemplate": "{\"lat\":{{latitude}}}"],
         ])
@@ -79,7 +78,6 @@ final class ConfigResolverTests: XCTestCase {
         assertRejects(["movingIntervalSec": "30"], key: "movingIntervalSec")
         assertRejects(["accuracy": 1], key: "accuracy")
         assertRejects(["disableStopDetection": "yes"], key: "disableStopDetection")
-        assertRejects(["licenseKey": 42], key: "licenseKey")
         assertRejects(["lowBattery": 5], key: "lowBattery")
         assertRejects(["lowBattery": ["belowPct": 20]], key: "lowBattery.intervalSec")
         assertRejects(["http": "https://x"], key: "http")
@@ -175,13 +173,17 @@ final class ConfigResolverTests: XCTestCase {
     }
 
     func testEmptyStringsMeanNull() throws {
-        let c = try resolve(["licenseKey": "  LP1.x.y\n", "http": ["url": "", "rootProperty": "", "locationTemplate": ""]])
-        XCTAssertEqual(c.licenseKey, "LP1.x.y")
+        let c = try resolve(["http": ["url": "", "rootProperty": "", "locationTemplate": ""]])
         XCTAssertNil(c.http.url)
         XCTAssertNil(c.http.uploadURL)
         XCTAssertNil(c.http.rootProperty)
         XCTAssertNil(c.http.locationTemplate)
-        XCTAssertNil(try resolve(["licenseKey": "   "]).licenseKey)
+    }
+
+    func testLicenseKeyFromOlderSetupsIsIgnored() throws {
+        let resolution = try ConfigResolver.resolve(["licenseKey": "LP1.x.y"])
+        XCTAssertEqual(resolution.config, LongPingConfig.defaults)
+        XCTAssertEqual(resolution.notes.map(\.kind), [.unknownKey])
     }
 
     func testTemplateIsValidatedAtConfigureTime() throws {

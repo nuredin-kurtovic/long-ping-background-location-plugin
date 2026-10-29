@@ -82,7 +82,8 @@ jobs:
           git commit -am "Release ${{ steps.version.outputs.version }}"
           git push origin HEAD:main
 
-      # The repo is private (since 1.0, commercial): npm only attaches provenance to public repos.
+      # Without provenance while the repo is private (npm only attaches it to public repos); back to plain
+      # `npm publish` once the repo is public again.
       - run: npm publish --provenance=false
 
       - name: Tag and GitHub release

@@ -84,7 +84,7 @@ public final class LongPingEngine: NSObject {
                               uploader: uploader)
         self.tracker = tracker
         network.start()
-        logger.info("engine", "engine ready (Long Ping \(PluginInfo.version), release \(LicenseVerifier.pluginReleaseDate), \(UIDevice.current.systemName) \(UIDevice.current.systemVersion))")
+        logger.info("engine", "engine ready (Long Ping \(PluginInfo.version), \(UIDevice.current.systemName) \(UIDevice.current.systemVersion))")
         return tracker
     }
 
