@@ -33,7 +33,14 @@ ios/Package.swift         SwiftPM package for Core + CoreTests (`swift test` on 
 android/                  com.longping — LongPingModule (RN bridge) + engine + core
 android/src/main/java/com/longping/core/   pure Kotlin logic, no android.* imports
 tools/android-core-tests/ standalone JVM Gradle project compiling core/ + its tests
+flutter/                  Flutter plugin `long_ping` (pub.dev): Dart API in lib/, bridges in
+                          android/src/main/kotlin/com/longping/flutter/ and ios/Classes/LongPingPlugin.swift
+                          (+ LongPingLaunch.m for launch resume). The engine (core/, engine/, Core/, Engine/,
+                          manifest, privacy manifest) is a copy made by tools/sync-flutter.sh; CI fails if it drifts.
 ```
+
+The engine never imports React Native or Flutter. The one host-specific need, showing the Android permission
+dialog, goes through `PermissionPrompt`, which each bridge implements.
 
 Native module name: `LongPing`. Android package: `com.longping`. Codegen spec class: `NativeLongPingSpec`
 (Android `com.longping.NativeLongPingSpec`, iOS protocol `NativeLongPingSpec` from `<LongPingSpec/LongPingSpec.h>`).

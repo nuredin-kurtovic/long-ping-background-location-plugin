@@ -1,0 +1,28 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - long_ping (1.1.0):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - long_ping (from `.symlinks/plugins/long_ping/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  long_ping:
+    :path: ".symlinks/plugins/long_ping/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  long_ping: 5503110d648c5be445f108eb98fd1616c28c34ff
+
+PODFILE CHECKSUM: aa138be8409ad2ab7f70f36aee65b237099b922e
+
+COCOAPODS: 1.16.2

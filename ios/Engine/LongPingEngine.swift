@@ -1,9 +1,9 @@
 import Foundation
 import UIKit
 
-/// Native entry point. The React Native bridge (LongPing.mm) forwards every call here; host apps can also
-/// call it directly. Thread-safe: work hops to the main thread (CoreLocation, engine state) or the io queue
-/// (sqlite, Keychain, uploads). Completions may arrive on any thread.
+/// Native entry point. The React Native bridge (LongPing.mm) and the Flutter plugin (LongPingPlugin.swift)
+/// forward every call here; host apps can also call it directly. Thread-safe: work hops to the main thread
+/// (CoreLocation, engine state) or the io queue (sqlite, Keychain, uploads). Completions may arrive on any thread.
 ///
 /// Completion contract: `(result, errorCode, errorMessage)`. `errorCode` non-nil = reject with a DESIGN.md
 /// error code; otherwise resolve with `result` (nil = void).
@@ -44,8 +44,9 @@ public final class LongPingEngine: NSObject {
 
     // MARK: - Launch
 
-    /// Called at every app launch (LongPing.mm `+load` observes didFinishLaunching), including background
-    /// relaunches by region / significant-change monitoring. Restarts tracking if it was enabled — no JS needed.
+    /// Called at every app launch (a `+load` in LongPing.mm / LongPingLaunch.m observes didFinishLaunching),
+    /// including background relaunches by region / significant-change monitoring. Restarts tracking if it was
+    /// enabled — no JS or Dart needed.
     @objc public func resumeIfEnabled() {
         DispatchQueue.onMain {
             guard self.canReadPreferences else { return self.waitForProtectedData() }

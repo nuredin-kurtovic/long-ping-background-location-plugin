@@ -9,8 +9,16 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.core.content.ContextCompat
-import com.facebook.react.modules.core.PermissionAwareActivity
 import com.longping.core.AuthorizationStatus
+
+/**
+ * Shows the system dialog for [permissions] and calls [onResult] once the user has answered. Each bridge
+ * supplies its own (React Native: PermissionAwareActivity; Flutter: the activity binding), so the engine
+ * stays free of either.
+ */
+internal fun interface PermissionPrompt {
+    fun request(permissions: Array<String>, requestCode: Int, onResult: () -> Unit)
+}
 
 /** Location permission state and the one prompt flow (requestPermission is the only call that prompts). */
 internal class Permissions(private val context: Context, private val prefs: EnginePrefs) {
@@ -46,7 +54,7 @@ internal class Permissions(private val context: Context, private val prefs: Engi
      * request opens the system settings page; its result arrives when the user comes back.
      * Must be called on the main thread.
      */
-    fun request(activity: Activity, aware: PermissionAwareActivity, level: Level, done: (Int) -> Unit) {
+    fun request(activity: Activity, prompt: PermissionPrompt, level: Level, done: (Int) -> Unit) {
         val main = Handler(Looper.getMainLooper())
         val finish = { done(status(activity)) }
 
@@ -54,10 +62,7 @@ internal class Permissions(private val context: Context, private val prefs: Engi
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || hasBackground()) {
                 finish()
             } else {
-                aware.requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_BACKGROUND) { _, _, _ ->
-                    finish()
-                    true
-                }
+                prompt.request(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_BACKGROUND) { finish() }
             }
         }
 
@@ -66,14 +71,13 @@ internal class Permissions(private val context: Context, private val prefs: Engi
             return
         }
         prefs.permissionAsked = true
-        aware.requestPermissions(
+        prompt.request(
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
             REQUEST_FOREGROUND,
-        ) { _, _, _ ->
-            // ReactActivityDelegate clears its listener after this callback returns true, so a
-            // second request issued from inside the callback would lose its listener: post it.
+        ) {
+            // ReactActivityDelegate clears its listener after this callback returns, so a second
+            // request issued from inside the callback would lose its listener: post it.
             if (level == Level.ALWAYS && hasForeground()) main.post { requestBackground() } else finish()
-            true
         }
     }
 

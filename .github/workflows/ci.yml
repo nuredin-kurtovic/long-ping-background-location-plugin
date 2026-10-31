@@ -33,6 +33,46 @@ jobs:
       - run: swift test
         working-directory: ios
 
+  flutter:
+    name: Flutter package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Engine copies match android/ and ios/
+        run: tools/sync-flutter.sh --check
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+        working-directory: flutter
+      - run: flutter analyze
+        working-directory: flutter
+      - run: flutter test
+        working-directory: flutter
+      - run: dart pub publish --dry-run
+        working-directory: flutter
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android build of the example app
+        run: flutter build apk --debug
+        working-directory: flutter/example
+
+  flutter-ios:
+    name: Flutter iOS build
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: iOS simulator build of the example app
+        run: flutter build ios --simulator --debug
+        working-directory: flutter/example
+
   package:
     name: Package contents
     runs-on: ubuntu-latest
