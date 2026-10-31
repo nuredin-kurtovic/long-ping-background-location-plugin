@@ -11,6 +11,7 @@ import com.longping.core.ErrorCode
 import com.longping.core.LongPingException
 import com.longping.engine.EventSink
 import com.longping.engine.LongPingEngine
+import com.longping.engine.PermissionPrompt
 import com.longping.engine.Permissions
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicInteger
@@ -101,9 +102,15 @@ class LongPingModule(reactContext: ReactApplicationContext) :
             promise.reject(ErrorCode.NO_ACTIVITY.name, "requestPermission needs a foreground activity that implements PermissionAwareActivity (ReactActivity does)")
             return
         }
+        val prompt = PermissionPrompt { permissions, requestCode, onResult ->
+            aware.requestPermissions(permissions, requestCode) { _, _, _ ->
+                onResult()
+                true
+            }
+        }
         UiThreadUtil.runOnUiThread {
             try {
-                engine.permissions.request(activity, aware, parsed) { status ->
+                engine.permissions.request(activity, prompt, parsed) { status ->
                     promise.resolve(status)
                     engine.onPermissionResult(status)
                 }

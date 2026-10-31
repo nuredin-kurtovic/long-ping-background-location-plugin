@@ -23,6 +23,10 @@ Free and open source (MIT). No license key, no paid tier.
 
 Requires React Native 0.76+ (New Architecture), iOS 15.1+, Android 7.0+ (API 24). Expo: SDK 52+ with the bundled config plugin.
 
+**Flutter:** the same native engine ships as [`long_ping`](https://pub.dev/packages/long_ping)
+(`flutter pub add long_ping`, Flutter 3.24+). Source and setup in [`flutter/`](flutter/); guide at
+[longping.dev/docs/getting-started/flutter](https://longping.dev/docs/getting-started/flutter/).
+
 ## Install
 
 ```sh

@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+# Listed up front so newer Flutter's `pub get` migration has nothing to add (a modified file fails the
+# pub publish dry run in CI).
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+
+formatter:
+  page_width: 120
